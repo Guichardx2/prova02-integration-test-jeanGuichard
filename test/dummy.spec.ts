@@ -6,7 +6,6 @@ describe('Dummy JSON', () => {
   const p = pactum;
   const rep = SimpleReporter;
   const baseUrl = 'https://dummyjson.com';
-  let deckId = '';
 
   p.request.setDefaultTimeout(30000);
 
