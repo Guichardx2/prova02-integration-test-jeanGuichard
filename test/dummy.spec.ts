@@ -47,6 +47,52 @@ describe('Dummy JSON', () => {
         });
     });
 
+    it('Get product that does not exist', async () => {
+      await p
+        .spec()
+        .get(`${baseUrl}/products/9999`)
+        .expectStatus(StatusCodes.NOT_FOUND)
+        .expectJson({
+          message: "Product with id '9999' not found",
+        });
+    })
+
+    it('Search products', async () => {
+      await p
+        .spec()
+        .get(`${baseUrl}/products/search`)
+        .withQueryParams('q', 'phone')
+        .expectStatus(StatusCodes.OK)
+        .expectJsonLike({
+          products: [
+            {
+              id: 101,
+              title: "Apple AirPods Max Silver",
+              description: "The Apple AirPods Max in Silver are premium over-ear headphones with high-fidelity audio, adaptive EQ, and active noise cancellation. Experience immersive sound in style.",
+              category: "mobile-accessories",
+              price: 549.99,
+              discountPercentage: 13.67,
+              rating: 3.47,
+              stock: 59,
+            }
+          ]
+        });
+    });
+
+    it('Search products with no match', async () => {
+      await p
+        .spec()
+        .get(`${baseUrl}/products/search`)
+        .withQueryParams('q', 'nonexistentproduct')
+        .expectStatus(StatusCodes.OK)
+        .expectJson({
+          products: [],
+          total: 0,
+          skip: 0,
+          limit: 0
+        });
+    })
+
     it('New Product', async () => {
       await p
         .spec()
@@ -76,6 +122,36 @@ describe('Dummy JSON', () => {
         .expectJsonLike({
           id: 20,
           price: 10.99
+        });
+    });
+
+    it('Update Product that does not exist', async () => {
+      await p
+        .spec()
+        .patch(`${baseUrl}/products/9999`)
+        .withJson({
+          price: 10.99
+        })
+        .expectStatus(StatusCodes.NOT_FOUND)
+        .expectJson({
+          message: "Product with id '9999' not found",
+        });
+    })
+    
+    it ('Delete Product', async () => {
+      await p
+        .spec()
+        .patch(`${baseUrl}/products/20`)
+        .expectStatus(StatusCodes.OK)
+    });
+
+    it('Delete Product that does not exist', async () => {
+      await p
+        .spec()
+        .delete(`${baseUrl}/products/9999`)
+        .expectStatus(StatusCodes.NOT_FOUND)
+        .expectJson({
+          message: "Product with id '9999' not found",
         });
     });
   });
